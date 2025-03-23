@@ -4,7 +4,8 @@ from models import db, Folder, Flashcard
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flashcards.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@db:5432/flashcards'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -21,6 +22,7 @@ def create_flashcard():
         definition=data['definition'],
         folder_id=data['folder_id']
     )
+
     db.session.add(new_card)
     db.session.commit()
     return jsonify({"message": "Flashcard added"})
@@ -33,16 +35,33 @@ def get_folder(user_id):
 @app.route('/folders', methods=['POST'])
 def create_folder():
     data = request.get_json()
+
+    flashcards_data = data.get('flashcards', [])
+
+    valid_flashcards = [fc for fc in flashcards_data if fc.get('term') and fc.get('definition')]
+    if len(valid_flashcards) < 2:
+        return jsonify({"error": "You must add at least 2 flashcards."}), 400
+
     new_folder = Folder(
         name=data['name'],
         user_id=data['user_id']
     )
     db.session.add(new_folder)
+    db.session.flush()
+
+    for fc in valid_flashcards:
+        flashcard = Flashcard(
+            term=fc['term'],
+            definition=fc['definition'],
+            folder_id=new_folder.id
+        )
+        db.session.add(flashcard)
+
     db.session.commit()
 
     return jsonify({
         "folder_id": new_folder.id,
-        "message": "Folder created successfully"
+        "message": "Folder and flashcards created successfully"
     }), 201
 
 @app.route('/flashcards/<int:folder_id>', methods=['GET'])
@@ -71,6 +90,24 @@ def update_flashcard(flashcard_id):
 
     db.session.commit()
     return jsonify({"message": "Flashcard updated successfully"})
+
+@app.route('/folder/<int:folder_id>', methods=['PUT'])
+def update_folder_name(folder_id):
+    folder = Folder.query.get(folder_id)
+    if not folder:
+        return jsonify({"error": "Folder not found"}), 404
+
+    data = request.get_json()
+    folder.name = data.get('name', folder.name)
+    db.session.commit()
+
+    return jsonify({"message": "Folder name updated successfully"})
+@app.route('/folder/<int:folder_id>', methods=['GET'])
+def get_folder_name(folder_id):
+    folder = Folder.query.get(folder_id)
+    if not folder:
+        return jsonify({"error": "Folder not found"}), 404
+    return jsonify({"id": folder.id, "name": folder.name})
 
 @app.route('/folders/<int:folder_id>', methods=['DELETE'])
 def delete_folder(folder_id):
