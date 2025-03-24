@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import time
 import psycopg2
 import os
@@ -21,17 +20,6 @@ from models import db, Folder, Flashcard, User
 app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
-
-=======
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from models import db, Folder, Flashcard
-app = Flask(__name__)
-CORS(app)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@db:5432/flashcards'
->>>>>>> 4c4017b5518e81d32f652941314f84cfc82df308
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -145,7 +133,6 @@ def delete_folder(folder_id):
     db.session.commit()
     return jsonify({"message": "Folder deleted successfully"})
 
-<<<<<<< HEAD
 @app.route('/sync-user', methods=['POST'])
 def sync_user():
     data = request.get_json()
@@ -163,10 +150,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True, host='0.0.0.0', port=5000)
-=======
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
->>>>>>> 4c4017b5518e81d32f652941314f84cfc82df308
