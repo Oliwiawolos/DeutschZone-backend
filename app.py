@@ -1,6 +1,8 @@
 import time
 import psycopg2
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 max_retries = 10
 while max_retries > 0:
