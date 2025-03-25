@@ -20,8 +20,14 @@ This is the backend for the DeutschZone web app. It is built with Flask and conn
 2. Navigate to the project’s root directory
 3. Install dependencies: `pip install -r requirements.txt`
 4. Create a `.env` file in the project root based on the following example: `SQLALCHEMY_DATABASE_URI=postgresql://user:password@localhost:5432/flashcards`
-5. Run the backend: `python app.py`
-6. The server will be running at: `http://localhost:5000`
+5. Make sure you have a local PostgreSQL database running:  
+- You can install it from https://www.postgresql.org/download/  
+- Create the database with:
+  ```sql
+  CREATE DATABASE flashcards;
+  ```
+6. Run the backend: `python app.py`
+7. The server will be running at: `http://localhost:5000`
 
 ### If you prefer Docker-based development: 
 1. Make sure you have a Dockerfile in the project root.
